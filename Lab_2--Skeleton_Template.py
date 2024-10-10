@@ -55,7 +55,6 @@ class LinearRegressionModel(jaxon.models.Model):
 
     @jaxon.utils.handle_backward(num_inputs=2)
     def backward(self, *inputs):
-
         """Implement the backwards pass, compute all derivatives."""
         X, y = inputs  # The training data
 
@@ -68,67 +67,58 @@ class LinearRegressionModel(jaxon.models.Model):
         # Compute the gradient of the loss function, wrt. both its arguments
         grad["loss"] = self.loss.backward(y, self.output["hypothesis"])
 
-        # Here you need to implement the backwards steps for all layers. Note
-        # that you need to compute derivatives for both layer weights _and_
-        # layer inputs.
+        print(J[0])
 
-        # ""W = J['W']
-        # b = J['b']
-        # inputs = J['inputs'][0]
+        # def compute_partial_derivatives(layer_dict):
+        #     partials = {}
+        #     W = layer_dict['W']
+        #     inputs = layer_dict['inputs'][0]  # Assuming there's only one input array
+            
+        #     # Compute partial derivative for weights (∂y/∂W)
+        #     dY_dW = jnp.einsum('ijkl->ijkl', inputs)
+        #     partials['W'] = dY_dW
 
-        # d_loss_d_output = grad["loss"]
+        #     # Compute partial derivative for inputs (∂y/∂X)
+        #     try:
+        #         W_reshaped = jnp.ones_like(W).reshape((30, 1, 20, 1))  # Broadcasting for einsum
+        #         dY_dX = jnp.einsum('ijkl,ijml->ijkl', inputs, W_reshaped)
+        #         partials['inputs'] = [dY_dX]  # Put in a list as required
+        #     except Exception as e:
+        #         print(f"Error during computation of dY_dX: {e}")
+        #         return partials  # Returning what we have so far
+
+        #     return partials
+
+        # def structure_partial_derivatives(layers):
+        #     grad = {}
+        #     # Compute and add partial derivatives for each layer
+        #     for layer_name, layer_dict in layers.items():
+        #         layer_partials = compute_partial_derivatives(layer_dict)
+        #         grad[layer_name] = {
+        #             "W": layer_partials["W"],
+        #             "inputs": layer_partials["inputs"]
+        #         }
+        #     return grad
+
+        # # Get the gradients for all layers
+        # layer_gradients = structure_partial_derivatives(J)
+
+        # # Merge the layer gradients with the loss gradient
+        # grad.update(layer_gradients)
+
+        # print("Gradient structure:")
+        # for key, value in grad.items():
+        #     if isinstance(value, dict):
+        #         print(f"{key}:")
+        #         for subkey, subvalue in value.items():
+        #             print(f"  {subkey}: shape {subvalue.shape if hasattr(subvalue, 'shape') else [arr.shape for arr in subvalue]}")
+        #     else:
+        #         print(f"{key}: shape {value.shape}")
         
-        # derivatives = {}
-
-        # # Derivates calculation for weights
-        # inputs_reshaped = inputs.reshape(inputs.shape[0], -1)
-        # d_loss_d_output_reshaped = d_loss_d_output.reshape(d_loss_d_output.shape[0], -1)
-        # dL_dW = np.dot(d_loss_d_output_reshaped.T, inputs_reshaped)
-        # derivatives['W'] = dL_dW.reshape(W.shape)""
-
-        def compute_partial_derivatives(layer_dict):
-            print("we got to function 2")
-            partials = {}
-            
-            W = layer_dict['W']
-            inputs = layer_dict['inputs'][0]  # Assuming there's only one input array
-            
-            print("we got here")
-            # Compute partial derivative for weights (∂y/∂W)
-            # This is equivalent to the input for each output unit
-            dY_dW = jnp.einsum('ijkl->ijkl', inputs)
-            partials['W'] = dY_dW
-            print(f"partials in func 2{partials=}")
-
-            
-            # Compute partial derivative for inputs (∂y/∂X)
-            # This is equivalent to the weights for each output unit
-            print("after partials")
-            dY_dX = jnp.einsum('lm->ijkm', W)
-            print("after dydx")
-            partials['inputs'] = [dY_dX]  # Put in a list as required
-            print(f"partials in func 2{partials=}")
-            return partials
-
-        def structure_partial_derivatives(layers):
-            grad = {}
-            print("do we get here??!?!?!?!")
-            # Compute and add partial derivatives for each layer
-            for layer_name, layer_dict in layers.items():
-                print(layer_name)
-                # print(layer_dict)
-                layer_partials = compute_partial_derivatives(layer_dict)
-                print(type(layer_partials))
-                grad[layer_name] = {
-                    "W": layer_partials["W"],
-                    "inputs": layer_partials["inputs"]
-                }
-            print("We got here yaaaayyy")
-            return grad
-        grad = structure_partial_derivatives(J)
 
 
-        return grad
+        # return grad
+
 
 
 model = LinearRegressionModel(loss, affine_hypothesis)
